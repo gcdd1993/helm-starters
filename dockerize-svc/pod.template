@@ -71,7 +71,7 @@ spec:
           {{- $targetPort := include "dependencyPort" (tuple $depName $dep.service $global)}}
         - {{ printf "%s://%s:%d" (default "tcp" $dep.service.type)  $targetHost  (int $targetPort) }}
             {{- if eq $dep.service.type "http" }}
-              {{- printf "/%s" (default "" $dep.service.uri) }}
+              {{- printf "%s" (default "" $dep.service.uri) }}
             {{- end }}
         {{- else if $dep.tcp }}
         - "tcp://{{ $dep.tcp.host }}:{{ $dep.tcp.port }}"
