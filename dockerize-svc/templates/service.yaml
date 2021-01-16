@@ -5,7 +5,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-{{- $svcIdentity := default (printf "%s-%s" (include "fullname" $global) $name) $svc.nameOverride}}
+  {{- $svcIdentity := include "serviceNameOf" (tuple $global.Chart.Name $name $global.Values $global) }}
   name: {{ $svcIdentity }}
   labels:
     app: {{ include "name" $global }}
@@ -18,13 +18,14 @@ spec:
   ports:
   {{- if .ports  }}
   {{- range $pName,$p := .ports }}
-    - name: {{ printf "%s-%s" $svcIdentity $pName }}
+    {{- $portFullname := include "portNameOf" (tuple $name $pName $global.Values $global) }}
+    - name: {{ $portFullname }}
       port: {{ $p.port }}
       {{- if $p.nodePort }}
       nodePort: {{ $p.nodePort }}
       {{- end }}
       protocol: {{ default "TCP" $p.protocol }}
-      targetPort: {{printf "%s-%s" $name $pName }}
+      targetPort: {{ $portFullname }}
   {{- end }}
   {{- end }}
 {{- end }}

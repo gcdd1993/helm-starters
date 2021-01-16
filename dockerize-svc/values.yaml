@@ -1,4 +1,4 @@
-# Default values for <CHARTNAME>.
+# Default values for kf-projekt.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -169,3 +169,8 @@ cronjob:
 ##
 
 serviceName: ""
+volumeClaims: {}
+  # name:
+  #   storageClass: <storage_class_name>
+  #   accessMode: ReadWriteOnce
+  #   size: 1Gi
