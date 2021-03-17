@@ -10,13 +10,8 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  selector:
-    matchLabels:
-      app: {{ include "name" $global }}
-      release: {{ .Release.Name }}
-  schedule: {{required "please set schedule for cronjob" .Values.cronjob.schedule }}
+  schedule: {{required "please set schedule for cronjob" .Values.cronjob.schedule | quote }}
   jobTemplate:
-    metadata:
     spec:
       template:
   {{- tpl (.Files.Get "pod.template" ) $global  | indent 8}}
