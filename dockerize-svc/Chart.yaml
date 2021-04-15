@@ -1,5 +1,14 @@
-apiVersion: v1
-appVersion: "1.0"
+home: https://www.baidu.com
+icon: https://www.baidu.com
+keywords:
+  - project
+maintainers:
+  - email: gaochen@halmawork.com
+    name: gaochen
+sources:
+  - https://www.baidu.com
+apiVersion: v2
+appVersion: 1.0.0
 description: A Helm chart for Kubernetes
-name: kf-batch
+name: <CHARTNAME>
 version: 0.1.0
