@@ -14,6 +14,7 @@ metadata:
     heritage: {{ $global.Release.Service }}
 spec:
 {{- with $svc }}
+  sessionAffinity: {{ default "None" .sessionAffinity }}
   type: {{ .type }}
   ports:
   {{- if .ports  }}
