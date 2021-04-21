@@ -16,12 +16,16 @@ If release name contains chart name it will be used as a full name.
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+
+
+{{- define "subchart.fullname" -}}
+{{- $subChartName := index . 0 -}}
+{{- $subChartValues := index . 1 -}}
+{{- $global := index . 2 -}}
+{{- default (printf "%s-%s" $global.Release.Name $subChartName) (default $subChartValues.nameOverride $subChartValues.fullnameOverride ) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -31,10 +35,10 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
-{{- define "dependencyName" -}}
-{{- $depObj := index . 0 -}}
-{{- $global := index . 1 -}}
+{{- define "dependencyHost" -}}
+{{- $depName := index . 0 -}}
+{{- $depObj := index . 1 -}}
+{{- $global := index . 2 -}}
 {{- $targetSvc := $depObj.target -}}
 
 {{- range $key,$value := $targetSvc.services -}}
@@ -43,7 +47,7 @@ Create chart name and version as used by the chart label.
     {{- if $value.nameOverride -}}
         {{- $value.nameOverride -}}
     {{- else -}}
-        {{- default (include "fullname" $global) $targetSvc.fullnameOverride }}-{{ $depObj.name }}
+        {{- default (printf "%s-%s" $global.Release.Name $depName) $targetSvc.fullnameOverride }}-{{ $depObj.name }}
     {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -51,19 +55,44 @@ Create chart name and version as used by the chart label.
 
 
 {{- define "dependencyPort" -}}
-{{- $depObj := index . 0 -}}
-{{- $global := index . 1 -}}
+{{- $depName := index . 0 -}}
+{{- $depObj := index . 1 -}}
+{{- $global := index . 2 -}}
 {{- $targetSvc := $depObj.target -}}
 
 {{- range $key,$value := $targetSvc.services -}}
 {{- if eq $key $depObj.name -}}
     {{- $svcObj:= $value }}
-    {{- $portName := default "default" $depObj.port }}
-    {{- range $portName,$portObj := $value.ports -}}
-        {{- if eq $portName $portName -}}
+    {{- $pNameWanted := default "default" $depObj.port }}
+    {{- range $pName,$portObj := $value.ports -}}
+        {{- if eq $pName $pNameWanted -}}
             {{- $portObj.port -}}
         {{- end -}}
     {{- end -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+
+{{- define "serviceNameOf" -}}
+{{- $chartName := index . 0 -}}
+{{- $svcName := index . 1 -}}
+{{- $base := index . 2 -}}
+{{- $global := index . 3 -}}
+
+{{- $svcObj := required (printf "service %s not exists" $svcName) (index $base.services $svcName ) }}
+{{- default (printf "%s-%s" (include "subchart.fullname" (tuple $chartName $base $global)) $svcName) $svcObj.nameOverride -}}
+
+{{- end -}}
+
+
+{{- define "portNameOf" -}}
+{{- $svcName := index . 0 -}}
+{{- $portName := index . 1 -}}
+{{- $base := index . 2 -}}
+{{- $global := index . 3 -}}
+
+{{- $svcObj := required (printf "service %s not exists" $svcName) (index $base.services $svcName ) -}}
+{{- printf "%s-%s" (default $svcName $svcObj.nameOverride) $portName | trunc 15 | trimSuffix "-" -}}
+
 {{- end -}}
