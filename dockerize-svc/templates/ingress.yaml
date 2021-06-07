@@ -30,7 +30,8 @@ spec:
     - host: {{ . | quote }}
       http:
         paths:
-          - path: {{ $ingressPath }}
+          - pathType: Prefix
+            path: {{ $ingressPath | quote }}
             backend:
               service:
                 name: {{ include "fullname" $global }}-http
