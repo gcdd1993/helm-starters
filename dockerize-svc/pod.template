@@ -62,7 +62,8 @@ spec:
   {{- end }}
   {{- if .Values.dependencies }}
     - name: {{ printf "%s-dockerize" (include "fullname" $global)}}
-      image: jwilder/dockerize:{{default "latest" .Values.dockerize.tag }}
+      image: jwilder/dockerize:{{default "0.6.1" .Values.dockerize.tag }}
+      imagePullPolicy: "IfNotPresent"
       args:
         {{- range $depName,$dep := .Values.dependencies }} 
         - "-wait" 
