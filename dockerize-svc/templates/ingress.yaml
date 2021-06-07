@@ -32,7 +32,7 @@ spec:
         paths:
           - path: {{ $ingressPath }}
             backend:
-              serviceName: {{ include "fullName" $global }}
-              servicePort: http
+              serviceName: {{ include "fullname" $global }}-http
+              servicePort: http-default
   {{- end }}
 {{- end }}
